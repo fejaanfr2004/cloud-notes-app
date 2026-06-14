@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cloud Notes App</title>
+
+    <style>
+
+        body{
+            font-family:Arial;
+            width:80%;
+            margin:auto;
+        }
+
+        input,
+        textarea{
+            width:100%;
+            padding:10px;
+            margin-top:10px;
+        }
+
+        button{
+            margin-top:10px;
+            padding:10px;
+        }
+
+        .note{
+            border:1px solid gray;
+            padding:10px;
+            margin-top:10px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<h1>Cloud Notes App</h1>
+
+<input type="text"
+       id="title"
+       placeholder="Enter Title">
+
+<textarea id="content"
+          placeholder="Write Note"></textarea>
+
+<button onclick="saveNote()">
+    Save Note
+</button>
+
+<h2>Saved Notes</h2>
+
+<div id="notes"></div>
+
+<script>
+
+async function saveNote(){
+
+    let title =
+        document.getElementById("title").value;
+
+    let content =
+        document.getElementById("content").value;
+
+    await fetch('/api/notes',{
+
+        method:'POST',
+
+        headers:{
+            'Content-Type':'application/json'
+        },
+
+        body:JSON.stringify({
+            title:title,
+            content:content
+        })
+
+    });
+
+    loadNotes();
+
+    document.getElementById("title").value="";
+    document.getElementById("content").value="";
+}
+
+async function loadNotes(){
+
+    const response =
+        await fetch('/api/notes');
+
+    const data =
+        await response.json();
+
+    let html = "";
+
+    data.forEach(note => {
+
+        html += `
+        <div class="note">
+            <h3>${note.title}</h3>
+            <p>${note.content}</p>
+        </div>
+        `;
+    });
+
+    document.getElementById("notes").innerHTML =
+        html;
+}
+
+loadNotes();
+
+</script>
+
+</body>
+</html>
